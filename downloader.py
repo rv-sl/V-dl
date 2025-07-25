@@ -78,7 +78,7 @@ def extract_formats(url):
         )
         title = title_result.stdout.strip()
 
-        # Get formats list
+        # Get formats list (as string)
         formats_result = subprocess.run(
             ["yt-dlp", "-F", url],
             stdout=subprocess.PIPE,
@@ -86,12 +86,49 @@ def extract_formats(url):
             text=True,
             check=True
         )
-        formats_output = formats_result.stdout
+        lines = formats_result.stdout.strip().splitlines()
 
-        return formats_output, title
+        formats = []
+        started = False
+        for line in lines:
+            if not started:
+                if line.strip().startswith("format code"):
+                    started = True
+                continue
+            parts = re.split(r"\s{2,}", line.strip())
+            if len(parts) < 4:
+                continue
+            format_id = parts[0]
+            ext = parts[1]
+            resolution = parts[2]
+            size_match = re.search(r'(\d+(?:\.\d+)?)([KMG]iB)', line)
+            if size_match:
+                size = size_match.group(1)
+                unit = size_match.group(2)
+                multiplier = {
+                    "KiB": 1024,
+                    "MiB": 1024**2,
+                    "GiB": 1024**3
+                }.get(unit, 1)
+                filesize = float(size) * multiplier
+            else:
+                filesize = None
+
+            # Skip formats with no file size or both audio+video missing
+            if not filesize:
+                continue
+
+            formats.append({
+                "format_id": format_id,
+                "ext": ext,
+                "resolution": resolution,
+                "filesize": int(filesize),
+            })
+
+        return formats, title
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e.stderr}")
-        return None, None
+        print(f"Error extracting formats: {e.stderr}")
+        return [], "Unknown"
 
 
 def download_format_err(url, format_id, hook):
