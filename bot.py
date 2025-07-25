@@ -1,31 +1,39 @@
 import os
 import time
 import asyncio
+#from dotenv import load_dotenv
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-#from dotenv import load_dotenv
 
 from downloader import extract_formats, download_format
 from utils import generate_thumbnail, get_duration
 from progress import progress_bar, format_bytes
 
+# Load environment
 #load_dotenv()
-bot = Client("bot_upv",
-    api_id=int(os.getenv("apiid")),
-    api_hash=os.getenv("apihash"),
-    bot_token=os.getenv("tk"))
 
+# Init bot
+bot = Client(
+    "bot",
+    api_id=int(os.getenv("API_ID")),
+    api_hash=os.getenv("API_HASH"),
+    bot_token=os.getenv("BOT_TOKEN")
+)
+
+# Ensure download dir
 os.makedirs("downloads", exist_ok=True)
 
 @bot.on_message(filters.command("start"))
 async def start(_, msg):
-    await msg.reply("👋 **Hi!**\nSend me any video/audio URL and I'll let you choose the quality to download and upload it to Telegram!")
+    await msg.reply("👋 **Hi!**\n\nSend me a video/audio URL and I’ll help you download and upload it to Telegram!")
+
 
 @bot.on_message(filters.text & filters.private)
 async def handle_url(_, msg):
     url = msg.text.strip()
     if not url.lower().startswith("http"):
         return
+
     status = await msg.reply("🔍 Extracting available formats...")
 
     try:
@@ -33,21 +41,30 @@ async def handle_url(_, msg):
     except Exception as e:
         return await status.edit(f"❌ Error extracting formats:\n`{e}`")
 
-    buttons = [
-        [InlineKeyboardButton(
-            f"{f['resolution']}p - {round(f['filesize'] / 1024**2, 1)}MB",
-            callback_data=f"{f['format_id']}|{url}"
-        )] for f in formats
-    ]
+    buttons = []
+    for f in formats:
+        label = f"{f['resolution']}p - {round(f['filesize'] / 1024**2, 1)}MB"
+        callback = f"{f['format_id']}|||{url[:40]}"
+        if len(callback.encode()) <= 64:  # Ensure under Telegram limit
+            buttons.append([InlineKeyboardButton(label, callback_data=callback)])
+
+    if not buttons:
+        return await status.edit("❌ No suitable formats found.")
+
     await status.edit(
-        f"🎬 **Select quality for:**\n`{title}`",
+        f"🎬 **Select quality for:**\n`{title[:64]}`",
         reply_markup=InlineKeyboardMarkup(buttons)
     )
+
 
 @bot.on_callback_query()
 async def on_format_selected(_, query):
     await query.answer()
-    format_id, url = query.data.split("|")
+    try:
+        format_id, url = query.data.split("|||")
+    except ValueError:
+        return await query.message.edit("⚠️ Invalid selection or expired data.")
+
     progress_msg = await query.message.reply("📥 Starting download...")
 
     last_time = time.time()
@@ -57,7 +74,6 @@ async def on_format_selected(_, query):
         if d["status"] == "downloading":
             now = time.time()
             if now - progress_data["last"] > 5:
-                percent = d.get("downloaded_bytes", 0) / max(d.get("total_bytes", 1), 1)
                 text = f"""📥 **Downloading...**
 
 **File:** `{os.path.basename(d.get('filename', 'file.mp4'))}`
@@ -90,7 +106,7 @@ async def on_format_selected(_, query):
     except Exception as e:
         await progress_msg.edit(f"❌ Upload failed:\n`{e}`")
 
-    # Clean up
+    # Cleanup
     try:
         os.remove(filepath)
         if thumb:
@@ -98,4 +114,6 @@ async def on_format_selected(_, query):
     except:
         pass
 
-bot.run()
+# Run the bot
+if __name__ == "__main__":
+    bot.run()
