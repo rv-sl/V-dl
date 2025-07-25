@@ -3,13 +3,13 @@ import time
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 from downloader import extract_formats, download_format
 from utils import generate_thumbnail, get_duration
 from progress import progress_bar, format_bytes
 
-load_dotenv()
+#load_dotenv()
 bot = Client("bot_upv",
     api_id=int(os.getenv("apiid")),
     api_hash=os.getenv("apihash"),
