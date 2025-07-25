@@ -15,9 +15,9 @@ from progress import progress_bar, format_bytes
 # Init bot
 bot = Client(
     "bot",
-    api_id=int(os.getenv("API_ID")),
-    api_hash=os.getenv("API_HASH"),
-    bot_token=os.getenv("BOT_TOKEN")
+    api_id=int(os.getenv("apiid")),
+    api_hash=os.getenv("apihash"),
+    bot_token=os.getenv("tk")
 )
 
 # Ensure download dir
