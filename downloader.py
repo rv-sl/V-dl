@@ -51,7 +51,7 @@ def download_format(url, format_id, hook):
 
     return out_path
 
-def extract_formats(url):
+def extract_formats_old(url):
     ydl_opts = {"quiet": True, "skip_download": True}
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -66,7 +66,7 @@ def extract_formats(url):
                 })
         return formats[:10], info.get("title", "Untitled")
 
-def get_title_and_formats(url):
+def extract_formats(url):
     try:
         # Get title
         title_result = subprocess.run(
