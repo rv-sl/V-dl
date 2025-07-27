@@ -17,7 +17,7 @@ async def handle_download_button(client, callback_query: CallbackQuery):
         progress_hook = create_progress_hook(downloading_msg, filename)
 
         # Start download
-        path = download_video(video_url, progress_hook=progress_hook)
+        path = await download_video(video_url, progress_hook=progress_hook)
 
         # Upload to Telegram
         #await downloading_msg.edit("📤 Uploading to Telegram...")
