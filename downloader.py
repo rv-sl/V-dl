@@ -41,7 +41,7 @@ def ffmpeg_progress_line_parser(line, duration):
             }
     return None
 
-def download_video(url, headers=None, progress_hook=None):
+async def download_video(url, headers=None, progress_hook=None):
     if headers is None:
         headers = {}
 
