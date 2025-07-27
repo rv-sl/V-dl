@@ -3,13 +3,25 @@ from pyrogram.types import CallbackQuery
 from downloader import download_video
 from progress import create_progress_hook
 from plugins.uploadtotg import upload_to_telegram
+import hashlib
 
+# You can replace this with a persistent database or file
+callback_data_store = {}
+
+def store_callback_data(data: str) -> str:
+    key = hashlib.md5(data.encode()).hexdigest()
+    callback_data_store[key] = data
+    return key
+
+def get_callback_data(key: str) -> str:
+    return callback_data_store.get(key)
 
 @Client.on_callback_query(filters.regex(r"^dl\|\|"))
 async def handle_download_button(client, callback_query: CallbackQuery):
     await callback_query.answer()
 
-    _, quality, video_url = callback_query.data.split("||", 2)
+    _, quality, vkey = callback_query.data.split("||", 2)
+    video_url = get_callback_data(vkey)
     downloading_msg = await callback_query.message.reply(f"📥 Starting download `{quality}p`...")
 
     try:
