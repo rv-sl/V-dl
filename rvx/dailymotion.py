@@ -1,6 +1,33 @@
 import requests
 import datetime
 import re
+from urllib.parse import urlparse, parse_qs
+
+def extract_dailymotion_id(url: str) -> str | None:
+    """
+    Extracts the video ID from various Dailymotion URL formats.
+    Returns the video ID (e.g., 'x5k8clg') or None if not found.
+    """
+
+    # Match short links like dai.ly/x5k8clg or full URL patterns
+    patterns = [
+        r'dailymotion\.com/video/([a-zA-Z0-9]+)',
+        r'dai\.ly/([a-zA-Z0-9]+)',
+        r'video=([a-zA-Z0-9]+)',  # For embedded or player URLs
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+
+    # Fallback: try parsing query string if format is unexpected
+    parsed = urlparse(url)
+    query = parse_qs(parsed.query)
+    if 'video' in query:
+        return query['video'][0]
+
+    return None
 
 def get_auto_stream_url(video_data):
     try:
@@ -49,7 +76,7 @@ def extract_m3u8(master_url: str):
         return {"error": str(e)}
 
 
-def extract(video_id: str) -> dict:
+def extract_byid(video_id: str) -> dict:
     url = f"https://geo.dailymotion.com/video/{video_id}.json"
     
     params = {
@@ -116,7 +143,9 @@ def extract(video_id: str) -> dict:
 
     return metadata
 
-
+def extract(url: str):
+    id= extract_dailymotion_id(url)
+    return extract_byid(id);
 # Example usage
 #if __name__ == "__main__":
     #video_id = "x843dhc" #"x5k8clg"  # Change this to the desired video ID
