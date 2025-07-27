@@ -1,7 +1,7 @@
 import os
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from auther import is_authorized
+from plugins.auther import is_authorized
 from rvx_ex import extract_video_info, extract_m3u8_qualities
 
 @Client.on_message(filters.text & filters.private & is_authorized())
