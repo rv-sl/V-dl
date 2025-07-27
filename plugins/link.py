@@ -1,8 +1,12 @@
 import os
+import hashlib
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from plugins.auther import is_authorized
 from rvx_ex import extract_video_info, extract_m3u8_qualities
+
+# Store hash->URL mapping for callback lookup
+Client.dl_cache = {}
 
 @Client.on_message(filters.text & filters.private)
 async def handle_url(client: Client, msg: Message):
@@ -16,7 +20,7 @@ async def handle_url(client: Client, msg: Message):
         file_info = extract_video_info(url)
         streams = file_info.get("streams", [])
 
-        # Check if there is an 'auto' (master m3u8) stream
+        # Check for master m3u8
         master_url = None
         for s in streams:
             if s.get("quality") == "auto" and s.get("type", "").endswith("mpegURL"):
@@ -31,7 +35,7 @@ async def handle_url(client: Client, msg: Message):
         if not formats:
             return await status.edit("❌ No stream formats found.")
 
-        # Create message caption
+        # Caption
         title = file_info.get("title", "Unknown Title")
         caption = (
             f"🎬 **{title}**\n"
@@ -43,15 +47,23 @@ async def handle_url(client: Client, msg: Message):
             f"🔗 [Video Page]({file_info.get('video_page_url')})"
         )
 
-        # Inline buttons for each quality
+        # Build buttons with size-safe callback_data
         buttons = []
         for fmt in formats:
-            label = f"{fmt['quality']}p"
-            cb_data = f"dl||{fmt['quality']}||{fmt['url']}"
-            if len(cb_data.encode()) <= 64:
-                buttons.append([InlineKeyboardButton(label, callback_data=cb_data)])
+            quality = fmt.get("quality", "unknown")
+            url = fmt.get("url", "")
+            if not url:
+                continue
 
-        # Send the thumbnail with caption and buttons
+            # Create hash for URL
+            url_hash = hashlib.md5(url.encode()).hexdigest()[:10]
+            cb_data = f"dl|{quality}|{url_hash}"
+
+            # Cache full URL safely
+            client.dl_cache[url_hash] = url
+            buttons.append([InlineKeyboardButton(f"{quality}p", callback_data=cb_data)])
+
+        # Reply with photo + caption + buttons
         await msg.reply_photo(
             photo=file_info.get("thumbnail"),
             caption=caption,
@@ -60,4 +72,4 @@ async def handle_url(client: Client, msg: Message):
         await status.delete()
 
     except Exception as e:
-        return await status.edit(f"❌ Error:\n`{e}`")
+        await status.edit(f"❌ Error:\n`{e}`")
