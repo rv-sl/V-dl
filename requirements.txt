@@ -5,3 +5,4 @@ pillow
 flask
 flask_cors
 gunicorn
+requests
