@@ -1,5 +1,5 @@
 import os
-import hashlib
+from callback_data import store_callback_data
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from plugins.auther import is_authorized
