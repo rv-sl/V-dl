@@ -56,11 +56,9 @@ async def handle_url(client: Client, msg: Message):
                 continue
 
             # Create hash for URL
-            url_hash = hashlib.md5(url.encode()).hexdigest()[:10]
+            url_hash = store_callback_data(url) #hashlib.md5(url.encode()).hexdigest()[:10]
             cb_data = f"dl|{quality}|{url_hash}"
 
-            # Cache full URL safely
-            client.dl_cache[url_hash] = url
             buttons.append([InlineKeyboardButton(f"{quality}p", callback_data=cb_data)])
 
         # Reply with photo + caption + buttons
