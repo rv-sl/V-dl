@@ -25,7 +25,7 @@ async def handle_download_button(client, callback_query: CallbackQuery):
         await upload_to_telegram(
             filepath=path, 
             chat_id=downloading_msg.chat.id, 
-            status_msg: downloading_msg, 
+            status_msg=downloading_msg, 
             send=1
         )
         #await downloading_msg.delete()
