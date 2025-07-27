@@ -1,43 +1,27 @@
-import os
-import time
-import asyncio
-from pyrogram import Client
+from pyrogram import Client, filters
 from pyrogram.types import CallbackQuery
+from downloader import download_video
+from progress import create_progress_hook
 
-from downloader import download_format
-from plugins.uploadtotg import upload_to_telegram
+@Client.on_callback_query(filters.regex(r"^dl\|\|"))
+async def handle_download_button(client, callback_query: CallbackQuery):
+    await callback_query.answer()
 
-@Client.on_callback_query()
-async def on_format_selected(_, query: CallbackQuery):
-    await query.answer()
-
-    try:
-        format_id, url = query.data.split("|||")
-    except ValueError:
-        return await query.message.edit("⚠️ Invalid selection or expired data.")
-
-    progress_msg = await query.message.reply("📥 Starting download...")
-
-    last_time = time.time()
-    progress_data = {"msg": progress_msg, "last": last_time}
-
-    def hook(d):
-        if d["status"] == "downloading":
-            now = time.time()
-            if now - progress_data["last"] > 5:
-                text = f"""📥 **Downloading...**
-
-**File:** `{os.path.basename(d.get('filename', 'file.mp4'))}`
-{progress_bar(d.get("downloaded_bytes", 0), d.get("total_bytes", 1))}
-**Size:** {format_bytes(d.get("downloaded_bytes", 0))} / {format_bytes(d.get("total_bytes", 1))}
-"""
-                asyncio.create_task(progress_data["msg"].edit(text))
-                progress_data["last"] = now
+    _, quality, video_url = callback_query.data.split("||", 2)
+    downloading_msg = await callback_query.message.reply(f"📥 Starting download `{quality}p`...")
 
     try:
-        filepath = download_format(url, format_id, hook)
+        filename = f"video_{quality}.mp4"
+        progress_hook = create_progress_hook(downloading_msg, filename)
+
+        # Start download
+        path = download_video(video_url, progress_hook=progress_hook)
+
+        # Upload to Telegram
+        await downloading_msg.edit("📤 Uploading to Telegram...")
+        await callback_query.message.reply_document(document=path)
+        await downloading_msg.delete()
+        os.remove(path)
+
     except Exception as e:
-        return await progress_msg.edit(f"❌ Download failed:\n`{e}`")
-
-    await upload_to_telegram(filepath, query.message, progress_msg, send=1)
-  
+        await downloading_msg.edit(f"❌ Failed:\n`{str(e)}`")
