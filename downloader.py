@@ -88,7 +88,14 @@ def download_video(url, headers=None, progress_hook=None):
             if progress_hook and duration:
                 prog = ffmpeg_progress_line_parser(line, duration)
                 if prog:
-                    progress_hook(prog)
+                    #progress_hook(prog)
+                    import asyncio
+                    awaitable = getattr(progress_hook, '__call__', None)
+                    if awaitable:
+                        try:
+                            await progress_hook(prog)
+                        except:
+                            pass
 
         process.wait()
         if process.returncode != 0 or not os.path.exists(output_path):
@@ -139,7 +146,14 @@ def download_video(url, headers=None, progress_hook=None):
                 if progress_hook and duration:
                     prog = ffmpeg_progress_line_parser(line, duration)
                     if prog:
-                        progress_hook(prog)
+                        #progress_hook(prog)
+                        import asyncio
+                        awaitable = getattr(progress_hook, '__call__', None)
+                        if awaitable:
+                            try:
+                                await progress_hook(prog)
+                            except:
+                                pass
 
             process.wait()
             os.remove(temp_path)
