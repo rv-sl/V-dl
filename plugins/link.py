@@ -5,8 +5,6 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from plugins.auther import is_authorized
 from rvx_ex import extract_video_info, extract_m3u8_qualities
 
-# Store hash->URL mapping for callback lookup
-Client.dl_cache = {}
 
 @Client.on_message(filters.text & filters.private)
 async def handle_url(client: Client, msg: Message):
