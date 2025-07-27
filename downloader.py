@@ -72,8 +72,9 @@ async def download_video(url, headers=None, progress_hook=None):
         cmd = ["ffmpeg", "-y"]
         if headers:
             cmd += format_headers(headers)
-        cmd += ["-i", url, "-c:v", "libx264", "-preset", "fast", "-c:a", "aac", "-movflags", "+faststart", output_path]
-
+        #cmd += ["-i", url, "-c:v", "libx264", "-preset", "fast", "-c:a", "aac", "-movflags", "+faststart", output_path]
+        cmd += ["-i", url, "-c", "copy", "-bsf:a", "aac_adtstoasc", output_path]
+        
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
 
         duration = None
@@ -126,11 +127,18 @@ async def download_video(url, headers=None, progress_hook=None):
 
         # Convert if it's a video
         if is_video_ext(ext):
+             #convert_cmd = [
+                #"ffmpeg", "-y", "-i", temp_path,
+                #"-c:v", "libx264", "-preset", "fast",
+                #"-c:a", "aac", "-movflags", "+faststart",
+                #output_path
+            #]
             convert_cmd = [
-                "ffmpeg", "-y", "-i", temp_path,
-                "-c:v", "libx264", "-preset", "fast",
-                "-c:a", "aac", "-movflags", "+faststart",
-                output_path
+               "ffmpeg", "-y", "-i", temp_path,
+               "-c", "copy",  # No re-encoding
+               "-bsf:a", "aac_adtstoasc",  # Fix for some AAC in MP4 containers
+               "-movflags", "+faststart",  # Enables streaming
+               output_path
             ]
             process = subprocess.Popen(convert_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
 
