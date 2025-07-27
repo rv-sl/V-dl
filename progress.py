@@ -17,3 +17,17 @@ def format_bytes(size):
         return f"{size:.2f} TB"
     except:
         return "N/A"
+
+async def update_progress(msg, start_time, current, total, filename):
+    now = time.time()
+    speed = current / (now - start_time + 1)
+    eta = (total - current) / speed if speed > 0 else 0
+
+    text = (
+        f"📥 **Downloading:** `{filename}`\n"
+        f"{progress_bar(current, total)}\n"
+        f"**Progress:** {format_bytes(current)} / {format_bytes(total)}\n"
+        f"🚀 **Speed:** {format_bytes(speed)}/s\n"
+        f"⏳ **ETA:** {time.strftime('%M:%S', time.gmtime(eta))}"
+    )
+    await msg.edit(text)
