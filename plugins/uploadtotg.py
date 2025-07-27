@@ -1,7 +1,8 @@
 import os
 import time
 import asyncio
-from utils import generate_thumbnail, get_duration, format_bytes, progress_bar
+from utils import generate_thumbnail, get_duration
+from progress import format_bytes, progress_bar
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait
 
