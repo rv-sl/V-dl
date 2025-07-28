@@ -44,7 +44,9 @@ def task_listener():
     while True:
         task = get_oldest_task()
         if task:
+            s["run"] = 1
             run_task(task)
+            s["run"] = 0
             time.sleep(5)  # Sleep between tasks
         else:
             time.sleep(1)  # Idle wait
