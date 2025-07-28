@@ -9,6 +9,9 @@ tasks = []
 # Lock for thread-safe operations
 task_lock = threading.Lock()
 
+def all_tasks():
+    return tasks
+    
 def add_task(task: dict):
     """Add a single task to the list."""
     with task_lock:
