@@ -1,6 +1,7 @@
 # task_manager.py
 import time
 import threading
+from st import s
 
 # Global task queue (FIFO)
 tasks = []
@@ -23,7 +24,7 @@ def add_task_list(task_list: list):
 def get_oldest_task():
     """Return and remove the oldest task (FIFO)."""
     with task_lock:
-        if tasks:
+        if tasks and s.get("run") == 0:
             return tasks.pop(0)
         return None
 
