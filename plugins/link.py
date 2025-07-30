@@ -67,6 +67,7 @@ async def handle_url(client: Client, msg: Message):
 
             buttons.append([InlineKeyboardButton(f"{quality}p", callback_data=cb_data)])
 
+        buttons.append([InlineKeyboardButton("❌️ Cancel ❌️", callback_data="del_msg")])
         # Reply with photo + caption + buttons
         await msg.reply_photo(
             photo=file_info.get("thumbnail"),
