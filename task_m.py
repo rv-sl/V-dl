@@ -31,21 +31,23 @@ def get_oldest_task():
             return tasks.pop(0)
         return None
 
-def run_task(task: dict):
+async def run_task(client, task: dict):
     """Placeholder for actual task processing logic."""
     print(f"Running task: {task}")
     # Simulate processing
+
+    
     time.sleep(2)
     print(f"Task completed: {task}")
 
-def task_listener():
+async def task_listener(client):
     """Main loop to listen and process tasks."""
     print("Task listener started. Waiting for tasks...")
     while True:
         task = get_oldest_task()
         if task:
             s["run"] = 1
-            run_task(task)
+            await run_task(client, task)
             s["run"] = 0
             time.sleep(5)  # Sleep between tasks
         else:
