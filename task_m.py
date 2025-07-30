@@ -43,7 +43,7 @@ async def run_task(client, task: dict):
     # Simulate processing
     await runner(client, task)
     
-    time.sleep(2)
+    await asyncio.sleep(2)
     print(f"Task completed: {task}")
 
 async def task_listener(client):
@@ -57,9 +57,9 @@ async def task_listener(client):
             s["run"] = 1
             await run_task(client, task)
             s["run"] = 0
-            time.sleep(5)  # Sleep between tasks
+            await asyncio.sleep(5)  # Sleep between tasks
         else:
-            time.sleep(1)  # Idle wait
+            await asyncio.sleep(1)  # Idle wait
 
 # Background listener (start this from start.py)
 def start_listener(client):
