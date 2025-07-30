@@ -1,5 +1,5 @@
 # task_manager.py
-import time
+import time, asyncio
 import threading
 from st import s
 
@@ -52,6 +52,15 @@ def task_listener():
             time.sleep(1)  # Idle wait
 
 # Background listener (start this from start.py)
-def start_listener():
-    listener_thread = threading.Thread(target=task_listener, daemon=True)
-    listener_thread.start()
+def start_listener(client):
+    #listener_thread = threading.Thread(target=task_listener, daemon=True)
+    #listener_thread.start()
+    def run_asyncio():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(task_listener(client))
+
+    thread = Thread(target=run_asyncio)
+    thread.daemon = True  # Set the thread as a daemon thread
+    thread.start()
+    
