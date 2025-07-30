@@ -61,7 +61,7 @@ async def handle_url(client: Client, msg: Message):
             }
             url_hash = store_callback_data(file_data) #hashlib.md5(url.encode()).hexdigest()[:10]
             if not url_hash:
-                status.edit_text("Sorry!...\n📚DB Err")
+                await status.edit_text("Sorry!...\n📚DB Err")
                 return
             cb_data = f"dl|{quality}|{url_hash}"
 
