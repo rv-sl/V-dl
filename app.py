@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from task_m import all_tasks, add_task, add_task_list, task_run  # You must define these in task_m.py
+from task_m import all_tasks, add_task, add_task_list, task_st  # You must define these in task_m.py
 
 app = Flask(__name__)
 CORS(app)
@@ -11,7 +11,7 @@ def hello_world():
     
 @app.route('/run')
 def runst():
-    return jsonify(task_run), 200
+    return jsonify(task_st()), 200
     
 @app.route('/add-task', methods=['POST'])
 def add_single_task():
