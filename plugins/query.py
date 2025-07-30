@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-from pyrogram.types import CallbackQuery
+from pyrogram.types import CallbackQuery, Message
 from downloader import download_video
 from progress import create_progress_hook
 from plugins.uploadtotg import upload_to_telegram
@@ -40,3 +40,10 @@ async def handle_download_button(client, callback_query: CallbackQuery):
 
     except Exception as e:
         await downloading_msg.edit(f"❌ Failed:\n`{str(e)}`")
+
+
+@Client.on_callback_query(filters.regex(r"^del"))
+async def del_msg(_, msg :Message):
+    await msg.delete()
+    
+
