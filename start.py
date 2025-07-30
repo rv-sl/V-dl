@@ -11,7 +11,7 @@ def start_bot():
 
 if __name__ == "__main__":
     # Start task listener
-    start_listener()
+    #start_listener()
 
     # Start Flask and bot in parallel threads
     t1 = threading.Thread(target=start_flask)
