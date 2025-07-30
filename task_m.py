@@ -2,7 +2,7 @@
 import time, asyncio
 import threading
 from st import s
-
+from autotask import runner
 # Global task queue (FIFO)
 tasks = []
 
@@ -35,7 +35,7 @@ async def run_task(client, task: dict):
     """Placeholder for actual task processing logic."""
     print(f"Running task: {task}")
     # Simulate processing
-
+    await runner(client, task)
     
     time.sleep(2)
     print(f"Task completed: {task}")
