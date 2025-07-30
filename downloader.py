@@ -119,7 +119,7 @@ async def download_video(url, headers=None, progress_hook=None):
                         downloaded += len(chunk)
                         if progress_hook and total > 0:
                             percent = (downloaded / total) * 100
-                            progress_hook({
+                            await progress_hook({
                                 "percent": round(percent, 2),
                                 "current": downloaded,
                                 "total": total
