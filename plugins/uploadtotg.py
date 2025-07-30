@@ -6,7 +6,7 @@ from progress import format_bytes, progress_bar
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait
 
-async def upload_to_telegram(filepath: str, chat_id: int, status_msg: Message, send: int = 1):
+async def upload_to_telegram(filepath: str, chat_id: int, status_msg: Message, caption: str, send: int = 1):
     try:
         await status_msg.edit("🖼 Generating thumbnail...")
         thumb = generate_thumbnail(filepath)
@@ -42,21 +42,25 @@ async def upload_to_telegram(filepath: str, chat_id: int, status_msg: Message, s
 
         # Upload the file
         if send == 0:
+            if not caption:
+                caption = "✅ Uploaded as document."
             await status_msg._client.send_document(
                 chat_id=chat_id,
                 document=filepath,
                 thumb=thumb,
-                caption="✅ Uploaded as document.",
+                caption=caption,
                 progress=progress
             )
         else:
+            if not caption:
+                caption = "✅ **Here is your video!** 🎉"
             await status_msg._client.send_video(
                 chat_id=chat_id,
                 video=filepath,
                 thumb=thumb,
                 duration=duration,
                 supports_streaming=True,
-                caption="✅ **Here is your video!** 🎉",
+                caption=caption,
                 progress=progress
             )
 
