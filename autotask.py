@@ -22,7 +22,7 @@ def get_best_quality(streams: list, desired_quality: str = "720") -> dict | None
 async def runner(client, data):
   ntext = (
     f"⏱️Starting Task!\n",
-    f"Url:"{data.get('link','None')}"
+    f"Url: {data.get('link','None')}"
   )
   status = await client.send_message(chat_id=data.get("chat"),text=ntext)
   try:
