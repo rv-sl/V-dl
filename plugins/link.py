@@ -54,7 +54,15 @@ async def handle_url(client: Client, msg: Message):
                 continue
 
             # Create hash for URL
+            file_data = {
+                url:url,
+                caption:caption,
+                title:title
+            }
             url_hash = store_callback_data(url) #hashlib.md5(url.encode()).hexdigest()[:10]
+            if not url_hash:
+                status.edit_text("Sorry!...\n📚DB Err")
+                return
             cb_data = f"dl|{quality}|{url_hash}"
 
             buttons.append([InlineKeyboardButton(f"{quality}p", callback_data=cb_data)])
