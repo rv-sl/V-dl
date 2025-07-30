@@ -6,7 +6,7 @@ from progress import format_bytes, progress_bar
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait
 
-async def upload_to_telegram(filepath: str, chat_id: int, status_msg: Message, caption: str, send: int = 1):
+async def upload_to_telegram(filepath: str, chat_id: int, status_msg: Message, caption: str = None, send: int = 1):
     try:
         await status_msg.edit("🖼 Generating thumbnail...")
         thumb = generate_thumbnail(filepath)
