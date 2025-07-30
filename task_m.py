@@ -1,6 +1,6 @@
 # task_manager.py
 import time, asyncio
-import threading
+from threading import Thread
 from st import s
 from autotask import runner
 # Global task queue (FIFO)
