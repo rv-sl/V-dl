@@ -1,6 +1,6 @@
 # task_manager.py
 import time, asyncio
-from threading import Thread
+import threading
 from st import s
 from autotask import runner
 # Global task queue (FIFO)
@@ -62,7 +62,7 @@ def start_listener(client):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(task_listener(client))
 
-    thread = Thread(target=run_asyncio)
+    thread = threading.Thread(target=run_asyncio)
     thread.daemon = True  # Set the thread as a daemon thread
     thread.start()
     
