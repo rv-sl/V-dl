@@ -5,6 +5,7 @@ from st import s
 from autotask import runner
 # Global task queue (FIFO)
 task_run={
+    "called":0,
     "started":0,
     "try":0
 }
@@ -65,7 +66,9 @@ async def task_listener(client):
 def start_listener(client):
     #listener_thread = threading.Thread(target=task_listener, daemon=True)
     #listener_thread.start()
+    task_run["called"]=1
     def run_asyncio():
+        task_run["called"]=2
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(task_listener(client))
