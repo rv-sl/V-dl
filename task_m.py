@@ -4,6 +4,10 @@ import threading
 from st import s
 from autotask import runner
 # Global task queue (FIFO)
+task_run={
+    "started":0,
+    "try":0
+}
 tasks = []
 
 # Lock for thread-safe operations
@@ -42,8 +46,10 @@ async def run_task(client, task: dict):
 
 async def task_listener(client):
     """Main loop to listen and process tasks."""
+    task_run["started"]=1
     print("Task listener started. Waiting for tasks...")
     while True:
+        task_run["try"]+=1
         task = get_oldest_task()
         if task:
             s["run"] = 1
