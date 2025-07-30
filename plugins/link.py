@@ -55,9 +55,9 @@ async def handle_url(client: Client, msg: Message):
 
             # Create hash for URL
             file_data = {
-                url:url,
-                caption:caption,
-                title:title
+                "url":url,
+                "caption":caption,
+                "title":title
             }
             url_hash = store_callback_data(file_data) #hashlib.md5(url.encode()).hexdigest()[:10]
             if not url_hash:
