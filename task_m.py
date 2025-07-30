@@ -12,6 +12,8 @@ tasks = []
 
 # Lock for thread-safe operations
 task_lock = threading.Lock()
+def task_st():
+    return task_run
 
 def all_tasks():
     return tasks
