@@ -11,14 +11,15 @@ async def handle_download_button(client, callback_query: CallbackQuery):
     await callback_query.answer()
 
     _, quality, vkey = callback_query.data.split("|", 2)
-    video_url = get_callback_data(vkey)
-    if not video_url:
+    video_obj = get_callback_data(vkey)
+    if not video_obj:
         await callback_query.message.reply("Sorry i think it was older buttons or data....")
         return
+    video_url = video_obj.get("url")
     downloading_msg = await callback_query.message.reply(f"📥 Starting download `{quality}p`...")
 
     try:
-        filename = f"video_{quality}.mp4"
+        filename = video_obj.get("title", f"video_{quality}.mp4")
         progress_hook = create_progress_hook(downloading_msg, filename)
 
         # Start download
